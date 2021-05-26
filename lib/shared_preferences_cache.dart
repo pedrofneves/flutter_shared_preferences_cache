@@ -10,7 +10,7 @@ class SharedPreferencesCache {
   static const String TS_PREFIX = 'spc_ts_';
 
   SharedPreferences _sharedPreferences;
-  static SharedPreferencesCache _instance;
+  static SharedPreferencesCache? _instance;
 
   static final Random random = Random();
   static const double evictChance = 0.05;
@@ -19,18 +19,18 @@ class SharedPreferencesCache {
 
   SharedPreferencesCache._(this._sharedPreferences, this._maxAge);
 
-  static Future<SharedPreferencesCache> getInstance(Duration maxAge) async {
+  static Future<SharedPreferencesCache?> getInstance(Duration maxAge) async {
     if (_instance == null) {
       SharedPreferences sp = await SharedPreferences.getInstance();
       _instance = SharedPreferencesCache._(sp, maxAge);
     } else {
-      _instance._maxAge = maxAge;
+      _instance!._maxAge = maxAge;
     }
     if (random.nextDouble() < evictChance) {
       // Eviction will only be executed every so ofter (based on evictChance)
       // This is a work-around to avoid race conditions if getInstance() is
       // called multiple times at roughly the same time.
-      _instance.evict();
+      _instance!.evict();
     }
 
     return _instance;
@@ -41,7 +41,7 @@ class SharedPreferencesCache {
     for (int i = 0; i < keys.length; i++) {
       String k = keys[i];
       if (k.startsWith(TS_PREFIX)) {
-        int tsWritten = _sharedPreferences.getInt(k);
+        int? tsWritten = _sharedPreferences.getInt(k);
         if (tsWritten != null && _isTimestampExpired(tsWritten)) {
           await this.remove(k.substring(TS_PREFIX.length));
         }
@@ -59,28 +59,28 @@ class SharedPreferencesCache {
   bool containsKey(String key) =>
       _sharedPreferences.containsKey(_getValueKey(key));
 
-  Future<bool> getBool(String key, Future<bool> Function() f) async {
+  Future<bool?> getBool(String key, Future<bool> Function() f) async {
     if (!containsKey(key) || _isKeyExpired(key)) {
       await _setBool(key, await f());
     }
     return _sharedPreferences.getBool(_getValueKey(key));
   }
 
-  Future<double> getDouble(String key, Future<double> Function() f) async {
+  Future<double?> getDouble(String key, Future<double> Function() f) async {
     if (!containsKey(key) || _isKeyExpired(key)) {
       await _setDouble(key, await f());
     }
     return _sharedPreferences.getDouble(_getValueKey(key));
   }
 
-  Future<int> getInt(String key, Future<int> Function() f) async {
+  Future<int?> getInt(String key, Future<int> Function() f) async {
     if (!containsKey(key) || _isKeyExpired(key)) {
       await _setInt(key, await f());
     }
     return _sharedPreferences.getInt(_getValueKey(key));
   }
 
-  Future<String> getString(String key, Future<String> Function() f) async {
+  Future<String?> getString(String key, Future<String> Function() f) async {
     if (!containsKey(key) || _isKeyExpired(key)) {
       await _setString(key, await f());
     }
@@ -138,7 +138,7 @@ class SharedPreferencesCache {
   }
 
   bool _isKeyExpired(String key) {
-    int ts = _sharedPreferences.getInt(_getTimestampKey(key));
+    int? ts = _sharedPreferences.getInt(_getTimestampKey(key));
     return ts == null || _isTimestampExpired(ts);
   }
 

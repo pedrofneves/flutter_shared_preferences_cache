@@ -7,7 +7,7 @@ import 'package:shared_preferences_platform_interface/shared_preferences_platfor
 
 void main() {
   FakeSharedPreferencesStore store;
-  SharedPreferencesCache spc;
+  SharedPreferencesCache? spc;
 
   String key = 'key1';
   String value = 'value';
@@ -22,7 +22,7 @@ void main() {
   });
 
   tearDown(() async {
-    await spc.clear();
+    await spc!.clear();
   });
 
   test('Simple usage', () async {
@@ -36,30 +36,30 @@ void main() {
     };
 
     //Cache miss, trigger calculation
-    print(await spc.getInt('the_answer', heavyFunction));
+    print(await spc!.getInt('the_answer', heavyFunction));
 
     //Cache is used
-    print(await spc.getInt('the_answer', heavyFunction));
+    print(await spc!.getInt('the_answer', heavyFunction));
   });
 
   test('writing, getting and removing values', () async {
-    String res = await spc.getString(key, () async {
+    String? res = await spc!.getString(key, () async {
       countFuncCalled++;
       return value;
     });
     expect(res, value);
     expect(countFuncCalled, 1);
 
-    res = await spc.getString(key, () async {
+    res = await spc!.getString(key, () async {
       countFuncCalled++;
       return otherValue;
     });
     expect(res, value);
     expect(countFuncCalled, 1);
 
-    await spc.remove(key);
+    await spc!.remove(key);
 
-    res = await spc.getString(key, () async {
+    res = await spc!.getString(key, () async {
       countFuncCalled++;
       return otherValue;
     });
@@ -68,14 +68,14 @@ void main() {
   });
 
   test('eviction policy', () async {
-    String res = await spc.getString(key, () async {
+    String? res = await spc!.getString(key, () async {
       countFuncCalled++;
       return value;
     });
     expect(res, value);
     expect(countFuncCalled, 1);
 
-    res = await spc.getString(key, () async {
+    res = await spc!.getString(key, () async {
       countFuncCalled++;
       return otherValue;
     });
@@ -84,7 +84,7 @@ void main() {
 
     sleep(Duration(milliseconds: 200));
 
-    res = await spc.getString(key, () async {
+    res = await spc!.getString(key, () async {
       countFuncCalled++;
       return otherValue;
     });
@@ -96,35 +96,35 @@ void main() {
     SharedPreferences sp = await SharedPreferences.getInstance();
     await sp.setString('foo', 'bar');
 
-    await spc.getString(key, () async => value);
+    await spc!.getString(key, () async => value);
 
     expect(sp.containsKey('foo'), true);
-    expect(spc.containsKey('foo'), false);
+    expect(spc!.containsKey('foo'), false);
 
-    expect(spc.containsKey(key), true);
+    expect(spc!.containsKey(key), true);
     expect(sp.containsKey(SharedPreferencesCache.VALUE_PREFIX + key), true);
     expect(sp.containsKey(SharedPreferencesCache.TS_PREFIX + key), true);
 
-    await spc.clear();
+    await spc!.clear();
 
     expect(sp.containsKey('foo'), true);
-    expect(spc.containsKey('foo'), false);
+    expect(spc!.containsKey('foo'), false);
 
-    expect(spc.containsKey(key), false);
+    expect(spc!.containsKey(key), false);
     expect(sp.containsKey(SharedPreferencesCache.VALUE_PREFIX + key), false);
     expect(sp.containsKey(SharedPreferencesCache.TS_PREFIX + key), false);
   });
 
   test('remove', () async {
     SharedPreferences sp = await SharedPreferences.getInstance();
-    await spc.getString(key, () async => value);
-    expect(spc.containsKey(key), true);
+    await spc!.getString(key, () async => value);
+    expect(spc!.containsKey(key), true);
     expect(sp.containsKey(SharedPreferencesCache.VALUE_PREFIX + key), true);
     expect(sp.containsKey(SharedPreferencesCache.TS_PREFIX + key), true);
 
-    await spc.remove(key);
+    await spc!.remove(key);
 
-    expect(spc.containsKey(key), false);
+    expect(spc!.containsKey(key), false);
     expect(sp.containsKey(SharedPreferencesCache.VALUE_PREFIX + key), false);
     expect(sp.containsKey(SharedPreferencesCache.TS_PREFIX + key), false);
   });
