@@ -104,22 +104,34 @@ class SharedPreferencesCache {
     return _sharedPreferences.remove(_getValueKey(key));
   }
 
-  Future<bool> _setBool(String key, bool value) async {
+  Future<bool> _setBool(String key, bool? value) async {
+    if (value == null) {
+      return false;
+    }
     await _setTimeStampForKey(key);
     return _sharedPreferences.setBool(_getValueKey(key), value);
   }
 
-  Future<bool> _setDouble(String key, double value) async {
+  Future<bool> _setDouble(String key, double? value) async {
+    if (value == null) {
+      return false;
+    }
     await _setTimeStampForKey(key);
     return _sharedPreferences.setDouble(_getValueKey(key), value);
   }
 
-  Future<bool> _setInt(String key, int value) async {
+  Future<bool> _setInt(String key, int? value) async {
+    if (value == null) {
+      return false;
+    }
     await _setTimeStampForKey(key);
     return _sharedPreferences.setInt(_getValueKey(key), value);
   }
 
-  Future<bool> _setString(String key, String value) async {
+  Future<bool> _setString(String key, String? value) async {
+    if (value == null) {
+      return false;
+    }
     await _setTimeStampForKey(key);
     return _sharedPreferences.setString(_getValueKey(key), value);
   }
