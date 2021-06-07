@@ -59,28 +59,28 @@ class SharedPreferencesCache {
   bool containsKey(String key) =>
       _sharedPreferences.containsKey(_getValueKey(key));
 
-  Future<bool?> getBool(String key, Future<bool> Function() f) async {
+  Future<bool?> getBool(String key, Future<bool?> Function() f) async {
     if (!containsKey(key) || _isKeyExpired(key)) {
       await _setBool(key, await f());
     }
     return _sharedPreferences.getBool(_getValueKey(key));
   }
 
-  Future<double?> getDouble(String key, Future<double> Function() f) async {
+  Future<double?> getDouble(String key, Future<double?> Function() f) async {
     if (!containsKey(key) || _isKeyExpired(key)) {
       await _setDouble(key, await f());
     }
     return _sharedPreferences.getDouble(_getValueKey(key));
   }
 
-  Future<int?> getInt(String key, Future<int> Function() f) async {
+  Future<int?> getInt(String key, Future<int?> Function() f) async {
     if (!containsKey(key) || _isKeyExpired(key)) {
       await _setInt(key, await f());
     }
     return _sharedPreferences.getInt(_getValueKey(key));
   }
 
-  Future<String?> getString(String key, Future<String> Function() f) async {
+  Future<String?> getString(String key, Future<String?> Function() f) async {
     if (!containsKey(key) || _isKeyExpired(key)) {
       await _setString(key, await f());
     }
